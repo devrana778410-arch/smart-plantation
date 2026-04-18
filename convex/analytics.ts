@@ -1,3 +1,5 @@
+declare const process: { env: Record<string, string | undefined> };
+
 /** Emits non-PII operational events towards analytics streams using standard Edge fetch. */
 export async function emitAnalyticsEvent(eventName: string, properties: Record<string, any>) {
   const POSTHOG_API_KEY = process.env.POSTHOG_API_KEY || 'fake-key-for-local';
