@@ -1,18 +1,25 @@
-import { PostHog } from 'posthog-node';
-
-// Utilizing environment variables (assumes POSTHOG_API_KEY is placed in convex dashboard)
-const client = new PostHog(process.env.POSTHOG_API_KEY || 'fake-key-for-local', { 
-  host: 'https://app.posthog.com' 
-});
-
-/** Emits non-PII operational events towards analytics streams. */
+/** Emits non-PII operational events towards analytics streams using standard Edge fetch. */
 export async function emitAnalyticsEvent(eventName: string, properties: Record<string, any>) {
-  client.capture({
-    distinctId: properties.role || 'system', // Avoid saving emails or names directly
-    event: eventName,
-    properties,
-  });
+  const POSTHOG_API_KEY = process.env.POSTHOG_API_KEY || 'fake-key-for-local';
   
-  // Necessary to flush on serverless edge networks/mutations gracefully
-  await client.flush();
+  if (POSTHOG_API_KEY === 'fake-key-for-local') {
+    return; // Don't crash or fetch if there's no key
+  }
+
+  // Using raw fetch to prevent the posthog-node dependency from breaking Convex's V8 Isolate environment
+  await fetch('https://us.i.posthog.com/capture/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      api_key: POSTHOG_API_KEY,
+      event: eventName,
+      properties: {
+        distinct_id: properties.role || 'system',
+        ...properties,
+      },
+      timestamp: new Date().toISOString(),
+    }),
+  });
 }
