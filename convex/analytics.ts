@@ -14,5 +14,5 @@ export async function emitAnalyticsEvent(eventName: string, properties: Record<s
   });
   
   // Necessary to flush on serverless edge networks/mutations gracefully
-  await client.flushAsync();
+  await client.flush();
 }
