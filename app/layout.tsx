@@ -26,4 +26,12 @@ export default function RootLayout({
         <ConvexClientProvider>
           <div className="app-shell">
             <Sidebar />
-  
+            <main className="main-content">
+              {children}
+            </main>
+          </div>
+        </ConvexClientProvider>
+      </body>
+    </html>
+  );
+}
