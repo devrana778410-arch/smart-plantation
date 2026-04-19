@@ -16,6 +16,7 @@ export default function Dashboard() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { signOut } = useAuthActions();
   const profile = useQuery(api.queries.users.current);
+  const stats = useQuery(api.queries.trees.getDashboardStats);
   const updateProfile = useMutation(api.queries.users.updateProfile);
 
   useEffect(() => {
@@ -105,35 +106,37 @@ export default function Dashboard() {
       <div className="metrics">
         <div className="metric-card">
           <h3>Total Trees Planted</h3>
-          <p className="value">124,500</p>
+          <p className="value">{stats ? stats.totalTrees.toLocaleString() : "..."}</p>
         </div>
         <div className="metric-card">
           <h3>Survival Rate</h3>
-          <p className="value">92.4%</p>
+          <p className="value">{stats ? `${stats.survivalRate}%` : "..."}</p>
         </div>
         <div className="metric-card">
           <h3>Pending Audits</h3>
-          <p className="value target">12</p>
+          <p className="value target">{stats ? stats.pendingAudits : "..."}</p>
         </div>
       </div>
 
       <div className="feed">
         <h2>Recent Inspections</h2>
         <div className="feed-list">
-           <div className="feed-item">
-              <div className="feed-thumbnail"></div>
-              <div className="feed-info">
-                 <strong>ID: QR-8349</strong>
-                 <span className="status-healthy">Healthy • 2 mins ago</span>
-              </div>
-           </div>
-           <div className="feed-item">
-              <div className="feed-thumbnail dead-thumb"></div>
-              <div className="feed-info">
-                 <strong>ID: QR-1102</strong>
-                 <span className="status-dead">Dead   • 45 mins ago</span>
-              </div>
-           </div>
+           {stats && stats.recentFeed.length > 0 ? (
+             stats.recentFeed.map((feedItem, idx) => (
+                <div key={idx} className="feed-item">
+                  <div className={`feed-thumbnail ${!feedItem.resolved_is_alive ? 'dead-thumb' : ''}`}></div>
+                  <div className="feed-info">
+                     <strong>ID: {feedItem.tree_id}</strong>
+                     <span className={feedItem.resolved_is_alive ? "status-healthy" : "status-dead"}>
+                        {feedItem.resolved_is_alive ? "Healthy" : "Dead"} • {feedItem.species} 
+                     </span>
+                     <small> — {new Date(feedItem.ts).toLocaleDateString()}</small>
+                  </div>
+                </div>
+             ))
+           ) : (
+              <p style={{opacity: 0.6, fontSize: '0.9rem'}}>No recent inspections found on the network.</p>
+           )}
         </div>
       </div>
       </div>

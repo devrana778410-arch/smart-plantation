@@ -90,3 +90,47 @@ export const getTreeProfile = query({
     };
   },
 });
+
+/** Aggregates system-wide operational metrics for the core dashboard interface */
+export const getDashboardStats = query({
+  args: {},
+  handler: async (ctx) => {
+    // For production scaling, these would be managed counter aggregates
+    const allTrees = await ctx.db.query("trees").collect();
+    const aliveTrees = allTrees.filter(t => t.is_alive).length;
+    const totalTrees = allTrees.length;
+    const survivalRate = totalTrees > 0 ? (aliveTrees / totalTrees) * 100 : 0;
+
+    const pendingAudits = await ctx.db
+      .query("audit_assignments")
+      .filter(q => q.eq(q.field("status"), "pending"))
+      .collect();
+
+    const recentInspections = await ctx.db
+      .query("inspection_events")
+      .order("desc")
+      .take(10);
+
+    // Enrich feed with tree tags
+    const enrichedFeed = await Promise.all(
+      recentInspections.map(async (inspection) => {
+        const tree = await ctx.db
+          .query("trees")
+          .filter(q => q.eq(q.field("tree_id"), inspection.tree_id))
+          .first();
+        
+        return {
+          ...inspection,
+          species: tree?.species || "Unknown",
+        };
+      })
+    );
+
+    return {
+      totalTrees,
+      survivalRate: survivalRate.toFixed(1),
+      pendingAudits: pendingAudits.length,
+      recentFeed: enrichedFeed,
+    };
+  }
+});
