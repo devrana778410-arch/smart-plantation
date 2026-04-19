@@ -29,9 +29,10 @@ export default function Register() {
       });
 
       // Immediately set their profile fields!
+      const rawNgoId = formData.get("ngo_slug");
       await updateProfile({
         name: formData.get("name") as string,
-        ngo_id: formData.get("ngo_slug") as string | undefined,
+        ngo_id: rawNgoId ? (rawNgoId as string) : undefined,
         role: accountType,
       });
 
