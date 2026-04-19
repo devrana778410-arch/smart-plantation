@@ -23,12 +23,37 @@ export default function Dashboard() {
     // Generate actual Resolution 6 spatial cells directly from client bypassing heavy Leaflet layers
     const originCell = latLngToCell(CENTER_LAT, CENTER_LNG, 6);
     const cells = gridDisk(originCell, 1); 
-    
     setH3Data(cells.map(c => ({
       index: c,
       boundary: cellToBoundary(c)
     })));
-  }, []);
+
+    // Initialize Leaflet Map safely exclusively on the client
+    if (typeof window !== "undefined") {
+      import("leaflet").then((L) => {
+        import("leaflet/dist/leaflet.css").then(() => {
+          // Prevent multiple initializations in React 18 strict mode
+          const container = L.DomUtil.get('map');
+          if (container && (container as any)._leaflet_id) {
+            return;
+          }
+
+          const map = L.map('map').setView([CENTER_LAT, CENTER_LNG], 13);
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+          }).addTo(map);
+
+          // If we had real tree locations, we would map over stats.recentFeed and add markers here
+          if (stats && stats.recentFeed.length > 0) {
+             // For now we just add a mock marker at the center since trees don't have lat/lng in recentfeed yet
+             L.circleMarker([CENTER_LAT, CENTER_LNG], { radius: 6, color: '#4CAF50', fillColor: '#4CAF50', fillOpacity: 0.8 }).addTo(map).bindPopup("Active Plantation Node");
+          }
+        });
+      });
+    }
+  }, [stats]);
 
   useEffect(() => {
     // Check if we have a pending profile to flush to the server
@@ -89,17 +114,10 @@ export default function Dashboard() {
       <div className={`app-content ${!isAuthenticated && !isLoading ? 'blurred' : ''}`}>
         <div className="map-view">
           <div className="map-placeholder">
-            <p>H3 Geospatial Matrix Online</p>
+            <p>Live GPS Verification Map</p>
             <small>Lat: {CENTER_LAT}, Lng: {CENTER_LNG}</small>
             
-            <div className="h3-preview-list">
-              {h3Data.length > 0 ? h3Data.map(d => (
-                <div key={d.index} className="h3-chip">
-                  <span>{d.index}</span>
-                  <small>{d.boundary[0][0].toFixed(3)}°, {d.boundary[0][1].toFixed(3)}°</small>
-                </div>
-              )) : <span>Processing arrays...</span>}
-            </div>
+            <div id="map" style={{ height: "300px", width: "100%", borderRadius: "12px", marginTop: "16px", zIndex: 0 }}></div>
           </div>
         </div>
 
