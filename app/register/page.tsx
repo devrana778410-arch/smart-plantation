@@ -22,18 +22,18 @@ export default function Register() {
 
     const formData = new FormData(e.currentTarget);
     try {
+      // Save profile context to localStorage to be flushed to DB after auth state propagates
+      const rawNgoId = formData.get("ngo_slug");
+      window.localStorage.setItem('pending_profile_name', formData.get("name") as string);
+      window.localStorage.setItem('pending_profile_role', accountType);
+      if (rawNgoId) {
+         window.localStorage.setItem('pending_profile_ngo_id', rawNgoId as string);
+      }
+
       await signIn("password", {
         email: formData.get("email") as string,
         password: formData.get("password") as string,
         flow: "signUp",
-      });
-
-      // Immediately set their profile fields!
-      const rawNgoId = formData.get("ngo_slug");
-      await updateProfile({
-        name: formData.get("name") as string,
-        ngo_id: rawNgoId ? (rawNgoId as string) : undefined,
-        role: accountType,
       });
 
       router.push("/");

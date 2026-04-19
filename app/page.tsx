@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { latLngToCell, gridDisk, cellToBoundary } from 'h3-js';
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useQuery, useConvexAuth } from "convex/react";
+import { useQuery, useConvexAuth, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import Link from 'next/link';
 
@@ -16,6 +16,7 @@ export default function Dashboard() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { signOut } = useAuthActions();
   const profile = useQuery(api.queries.users.current);
+  const updateProfile = useMutation(api.queries.users.updateProfile);
 
   useEffect(() => {
     // Generate actual Resolution 6 spatial cells directly from client bypassing heavy Leaflet layers
@@ -27,6 +28,30 @@ export default function Dashboard() {
       boundary: cellToBoundary(c)
     })));
   }, []);
+
+  useEffect(() => {
+    // Check if we have a pending profile to flush to the server
+    if (isAuthenticated && profile !== undefined) {
+      const pendingName = window.localStorage.getItem('pending_profile_name');
+      const pendingRole = window.localStorage.getItem('pending_profile_role');
+      const pendingNgoId = window.localStorage.getItem('pending_profile_ngo_id') || undefined;
+
+      if (pendingName && pendingRole) {
+        updateProfile({
+          name: pendingName,
+          role: pendingRole,
+          ngo_id: pendingNgoId,
+        }).then(() => {
+          // Flush complete, clean up
+          window.localStorage.removeItem('pending_profile_name');
+          window.localStorage.removeItem('pending_profile_role');
+          window.localStorage.removeItem('pending_profile_ngo_id');
+        }).catch(err => {
+          console.error("Failed to sync profile:", err);
+        });
+      }
+    }
+  }, [isAuthenticated, profile, updateProfile]);
 
   return (
     <div className="dashboard-container">
