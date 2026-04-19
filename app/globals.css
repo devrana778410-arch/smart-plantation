@@ -99,3 +99,24 @@ input:focus, select:focus { outline: 1px solid var(--primary); background: var(-
 .btn-secondary:hover { background: var(--surface-high); }
 .mt-24 { margin-top: 24px; }
 .pt-4 { padding-top: 16px; }
+
+/* Responsive Mobile Layout */
+@media (max-width: 768px) {
+  .app-shell { flex-direction: column; height: auto; min-height: 100vh; overflow-x: hidden; }
+  .desktop-nav { width: 100%; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 20px 16px; }
+  .nav-brand { margin-bottom: 16px; text-align: center; }
+  .nav-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .nav-links li { margin: 0; }
+  .nav-links li[style] { display: none !important; }
+  .nav-links a { padding: 8px 12px; font-size: 0.85rem; text-align: center; }
+  .sync-status { margin-top: 16px; justify-content: center; }
+  
+  .dashboard-container { padding: 24px 16px; }
+  .metrics { flex-direction: column; gap: 16px; }
+  .form-grid { grid-template-columns: 1fr; }
+  
+  .header h1 { font-size: 1.8rem; }
+  .metric-card { padding: 20px 16px; }
+  .value { font-size: 2.5rem; }
+  .action-bar { flex-direction: column; }
+}
