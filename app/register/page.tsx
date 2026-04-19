@@ -25,8 +25,10 @@ export default function Register() {
         flow: "signUp",
       });
       router.push("/");
-    } catch (err) {
-      setError("Registration failed. That email may already be in use.");
+    } catch (err: any) {
+      console.error("Registration error:", err);
+      // Give a more descriptive error if possible
+      setError(err?.message || "Registration failed. See console for details.");
     } finally {
       setLoading(false);
     }

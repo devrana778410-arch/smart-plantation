@@ -24,8 +24,9 @@ export default function Login() {
         flow: "signIn",
       });
       router.push("/"); // redirect to dashboard/home on success
-    } catch (err) {
-      setError("Invalid email or password.");
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setError(err?.message || "Invalid email or password.");
     } finally {
       setLoading(false);
     }
