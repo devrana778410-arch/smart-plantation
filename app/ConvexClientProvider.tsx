@@ -1,7 +1,7 @@
 "use client";
 
 import { ConvexReactClient } from "convex/react";
-import { ConvexAuthNextjsProvider } from "@convex-dev/auth/nextjs";
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ReactNode } from "react";
 
 // Use an environment variable or dummy fallback for UI scaffolding
@@ -14,8 +14,8 @@ export default function ConvexClientProvider({
   children: ReactNode;
 }) {
   return (
-    <ConvexAuthNextjsProvider client={convex}>
+    <ConvexAuthProvider client={convex}>
       {children}
-    </ConvexAuthNextjsProvider>
+    </ConvexAuthProvider>
   );
 }
