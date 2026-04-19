@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "next dev",
-    "build": "npx convex deploy && next build --webpack",
+    "build": "node scripts/set-convex-env.js && npx convex deploy && next build --webpack",
     "start": "next start"
   },
   "dependencies": {
