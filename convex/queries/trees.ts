@@ -77,7 +77,7 @@ export const getTreeProfile = query({
     let auditorName = null;
     if (activeAudit) {
       const auditor = await ctx.db
-        .query("users")
+        .query("app_users")
         .filter((q) => q.eq(q.field("user_id"), activeAudit.auditor_id))
         .first();
       auditorName = auditor?.name || null;
