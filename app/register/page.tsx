@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { useRouter } from "next/navigation";
 
 export default function Register() {
   const [accountType, setAccountType] = useState('citizen');
   const { signIn } = useAuthActions();
+  const updateProfile = useMutation(api.queries.users.updateProfile);
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -24,6 +27,14 @@ export default function Register() {
         password: formData.get("password") as string,
         flow: "signUp",
       });
+
+      // Immediately set their profile fields!
+      await updateProfile({
+        name: formData.get("name") as string,
+        ngo_id: formData.get("ngo_slug") as string | undefined,
+        role: accountType,
+      });
+
       router.push("/");
     } catch (err: any) {
       console.error("Registration error:", err);
@@ -42,14 +53,16 @@ export default function Register() {
         
         <div className="account-type-toggle">
            <button 
+             type="button"
              className={accountType === 'citizen' ? 'active' : ''} 
              onClick={() => setAccountType('citizen')}
            >
              Individual / Citizen
            </button>
            <button 
-             className={accountType === 'ngo' ? 'active' : ''} 
-             onClick={() => setAccountType('ngo')}
+             type="button"
+             className={accountType === 'dept_official' ? 'active' : ''} 
+             onClick={() => setAccountType('dept_official')}
            >
              Organization
            </button>
@@ -64,7 +77,7 @@ export default function Register() {
             <input name="email" type="email" placeholder="john@example.com" required />
           </label>
 
-          {accountType === 'ngo' && (
+          {accountType === 'dept_official' && (
              <label>Organization Handle (Optional)
                <input name="ngo_slug" type="text" placeholder="green-earth-initiative" />
              </label>
