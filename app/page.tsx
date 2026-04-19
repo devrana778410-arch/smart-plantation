@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { latLngToCell, gridDisk, cellToBoundary } from 'h3-js';
-import { useConvexAuth, useAuthActions } from "@convex-dev/auth/react";
-import { useQuery } from "convex/react";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useQuery, useConvexAuth } from "convex/react";
 import { api } from "../convex/_generated/api";
 import Link from 'next/link';
 
