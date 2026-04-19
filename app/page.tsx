@@ -124,11 +124,11 @@ export default function Dashboard() {
            {stats && stats.recentFeed.length > 0 ? (
              stats.recentFeed.map((feedItem, idx) => (
                 <div key={idx} className="feed-item">
-                  <div className={`feed-thumbnail ${!feedItem.resolved_is_alive ? 'dead-thumb' : ''}`}></div>
+                  <div className={`feed-thumbnail ${!feedItem.is_alive ? 'dead-thumb' : ''}`}></div>
                   <div className="feed-info">
                      <strong>ID: {feedItem.tree_id}</strong>
-                     <span className={feedItem.resolved_is_alive ? "status-healthy" : "status-dead"}>
-                        {feedItem.resolved_is_alive ? "Healthy" : "Dead"} • {feedItem.species} 
+                     <span className={feedItem.is_alive ? "status-healthy" : "status-dead"}>
+                        {feedItem.is_alive ? "Healthy" : "Dead"} • {feedItem.species} 
                      </span>
                      <small> — {new Date(feedItem.ts).toLocaleDateString()}</small>
                   </div>
