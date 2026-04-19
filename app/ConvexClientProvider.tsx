@@ -4,9 +4,10 @@ import { ConvexReactClient } from "convex/react";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ReactNode } from "react";
 
-const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+// Force all Vercel pipelines to solely rely on the configured Convex environment
+const convexUrl = "https://friendly-bee-839.convex.cloud";
 
-const convex = new ConvexReactClient(convexUrl || "https://dummy-smart-plantation.convex.cloud");
+const convex = new ConvexReactClient(convexUrl);
 
 export default function ConvexClientProvider({
   children,
