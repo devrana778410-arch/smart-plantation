@@ -111,6 +111,7 @@ export default function Dashboard() {
            </div>
         </div>
       </div>
+      </div>
 
       <style jsx>{`
         .header { display: flex; justify-content: space-between; align-items: center; }
