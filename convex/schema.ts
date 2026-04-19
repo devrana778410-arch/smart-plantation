@@ -34,7 +34,7 @@ export default defineSchema({
   })
     .index("by_tree_id_and_ts", ["tree_id", "ts"]),
 
-  users: defineTable({
+  app_users: defineTable({
     user_id: v.string(),
     name: v.string(),
     email: v.string(),
